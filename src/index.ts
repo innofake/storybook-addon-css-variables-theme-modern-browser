@@ -6,19 +6,41 @@ import { ADDON_PARAM_KEY, CLEAR_LABEL } from './constants';
 let currentCSS: any = null;
 
 async function addBrandStyles(id: string, files: { [key:string]: any }) {
-  const file = files[id];
+  let file = files[id];
   if (file) {
-    file.use();
+    
+    // Async support
+    file = await file;
+
+    if (file.use) {
+      file.use();
+    } else if (file.default) { // Support for import as module
+      file.default.use();
+    } else {
+      console.error('Unable to load css file', file);
+    }
 
     // If we've got a CSS file in use, turn it off
     if (currentCSS) {
-      currentCSS.unuse();
+      if (currentCSS.unuse) {
+        currentCSS.unuse();
+      } else if (currentCSS.default) { // Support for import as module
+        currentCSS.default.unuse();
+      } else {
+        console.error('Unable to unload css file', currentCSS);
+      }
     }
 
     currentCSS = file;
   }
   if (currentCSS && id === CLEAR_LABEL) {
-    currentCSS.unuse();
+    if (currentCSS.unuse) {
+      currentCSS.unuse();
+    } else if (currentCSS.default) { // Support for import as module
+      currentCSS.default.unuse();
+    } else {
+      console.error('Unable to unload css file', currentCSS);
+    }
     currentCSS = null;
   }
 }
@@ -59,3 +81,5 @@ export default makeDecorator({
     return getStory(context);
   },
 });
+
+export { Dropdown } from './register';

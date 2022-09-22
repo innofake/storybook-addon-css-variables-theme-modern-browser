@@ -40,7 +40,7 @@ const ActiveViewportLabel = styled.div<{}>(({ theme }) => ({
   background: 'transparent',
 }));
 
-const Dropdown = () => {
+export const Dropdown = () => {
   const cookieTheme = getCookie('cssVariables');
   const addonParams: Params = useParameter(ADDON_PARAM_KEY, {});
   const { theme, defaultTheme, files } = addonParams;
